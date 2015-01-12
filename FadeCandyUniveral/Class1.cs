@@ -7,5 +7,6 @@ namespace FadeCandyUniveral
 {
     public class Class1
     {
+         
     }
 }

@@ -12,12 +12,16 @@ using System.Threading.Tasks;
 
 namespace FadeCandySharp
 {
+    // This class is the base class for everything. 
+    // It owns the connection to the server and creating devices.
     public class FadeCandyDeviceFactory
     {
         private string m_server;
         private int m_port;
         private ClientWebSocket m_webSocket = null;
+        List<FadeCandyDevice> m_attachedDevices;
 
+        // Used to reflect the get devices API call.
         private class JsonDevicesResponse
         {
             public string type;
@@ -31,11 +35,14 @@ namespace FadeCandySharp
                 throw new Exception("You must set a valid adress and port!");
             }
 
+            m_attachedDevices = new List<FadeCandyDevice>();
+
             // Set them
             m_server = server;
             m_port = port;
         }
 
+        // Returns a list of devices, devices own the LEDs on them.
         public List<FadeCandyDevice> GetDevices()
         {
             // Ask the server for a list of devices
@@ -44,16 +51,32 @@ namespace FadeCandySharp
             // Parse the response
             JsonDevicesResponse responseObj = JsonConvert.DeserializeObject<JsonDevicesResponse>(response);
 
-            List<FadeCandyDevice> devices = new List<FadeCandyDevice>();
+            // Loop through the response, add or remove devices if they are new
             foreach (FadeCandyDevice.DeviceData jDevice in responseObj.devices)
             {
-                FadeCandyDevice device = new FadeCandyDevice(this, jDevice);
-                devices.Add(device);
-            }
+                // Check if the device is already created
+                bool alreadyExists = false;
+                foreach (FadeCandyDevice searchDevice in m_attachedDevices)
+                {
+                    if(searchDevice.GetDeviceData().serial == jDevice.serial)
+                    {
+                        alreadyExists = true;
+                        break;
+                    }
+                }
 
-            return devices;
+                if(!alreadyExists)
+                {
+                    // Create the new device
+                    FadeCandyDevice device = new FadeCandyDevice(this, jDevice);
+                    m_attachedDevices.Add(device);
+                }                
+            }
+            return m_attachedDevices;
         }
 
+        // This will send raw data to (one?) device. This should only be called by
+        // the devices.
         public void SendRawData(byte[] data)
         {
             EnsureConnection();
@@ -62,35 +85,53 @@ namespace FadeCandySharp
             ArraySegment<byte> sendBytes = new ArraySegment<byte>(data);
             Exception ex = null;
 
-            // Send it
-            using (AutoResetEvent are = new AutoResetEvent(false))
+            // Lock the socket and send it.
+            lock (m_webSocket)
             {
-                ThreadPool.QueueUserWorkItem(async (object obj) =>
+                using (AutoResetEvent are = new AutoResetEvent(false))
                 {
-                    try
+                    ThreadPool.QueueUserWorkItem(async (object obj) =>
                     {
-                        CancellationToken token = new CancellationToken();
-                        await m_webSocket.SendAsync(sendBytes, WebSocketMessageType.Binary, true, token);
-                    }
-                    catch (Exception e)
-                    {
-                        ex = e;
-                    }
-                    are.Set();
-                });
-                are.WaitOne();
+                        try
+                        {
+                            CancellationToken token = new CancellationToken();
+                            await m_webSocket.SendAsync(sendBytes, WebSocketMessageType.Binary, true, token);
+                        }
+                        catch (Exception e)
+                        {
+                            ex = e;
+                        }
+                        are.Set();
+                    });
+                    are.WaitOne();
+                }
             }
 
             if (ex != null)
             {
                 ResetConnection();
                 throw ex;
-            }
+            }            
         }
 
-        public void SetDeviceOptions(FadeCandyDevice.DeviceData deviceData, bool? light, bool dither, bool interpolate)
+        // Sets the options for a device.
+        public void SetDeviceOptions(FadeCandyDevice.DeviceData deviceData, FadeCandyDevice.LightStatus status, bool dither, bool interpolate)
         {
-            string lightStr = light.HasValue ? (light.Value ? "true" : "false") : "null";
+            string lightStr = "null";
+            switch(status)
+            {
+                case FadeCandyDevice.LightStatus.Auto:
+                    lightStr = "null";
+                    break;
+                case FadeCandyDevice.LightStatus.On:
+                    lightStr = "true";
+                    break;
+                case FadeCandyDevice.LightStatus.Off:
+                    lightStr = "false";
+                    break;
+                default:
+                    throw new Exception("Unknown light status");
+            }
             string ditherStr = dither ? "true" : "false";
             string interStr = interpolate ? "true" : "false";
 
@@ -98,13 +139,7 @@ namespace FadeCandySharp
             SendMessage(message);
         }
 
-        public void SendPixels(FadeCandyDevice.DeviceData deviceData)
-        {
-            string message = "{\"type\": \"device_pixels\", \"device\": {\"type\": \"fadecandy\",\"serial\": \""+ deviceData.serial +"\"},\"pixels\": [255, 0, 0,0, 255, 0, 0, 0, 255]}";
-            SendMessage(message);
-        }
-
-
+        // Makes sure there is a valid connection.
         private void EnsureConnection()
         {
             if (m_webSocket != null)
@@ -142,11 +177,13 @@ namespace FadeCandySharp
             }
         }
 
+        // Resets the connection if there is an error
         private void ResetConnection()
         {
             m_webSocket = null;
         }
 
+        // Sends a json message to the server, returns the response as a string.
         private string SendMessage(string message)
         {
             EnsureConnection();
@@ -155,23 +192,26 @@ namespace FadeCandySharp
             ArraySegment<byte> sendBytes = new ArraySegment<byte>(Encoding.ASCII.GetBytes(message));
             Exception ex = null;
 
-            // Send them
-            using (AutoResetEvent are = new AutoResetEvent(false))
+            // Lock the websocket and send
+            lock (m_webSocket)
             {
-                ThreadPool.QueueUserWorkItem(async (object obj) =>
+                using (AutoResetEvent are = new AutoResetEvent(false))
                 {
-                    try
+                    ThreadPool.QueueUserWorkItem(async (object obj) =>
                     {
-                        CancellationToken token = new CancellationToken();               
-                        await m_webSocket.SendAsync(sendBytes, WebSocketMessageType.Text, true, token);
-                    }
-                    catch(Exception e)
-                    {
-                        ex = e;
-                    }
-                    are.Set();
-                });
-                are.WaitOne();
+                        try
+                        {
+                            CancellationToken token = new CancellationToken();
+                            await m_webSocket.SendAsync(sendBytes, WebSocketMessageType.Text, true, token);
+                        }
+                        catch (Exception e)
+                        {
+                            ex = e;
+                        }
+                        are.Set();
+                    });
+                    are.WaitOne();
+                }
             }
 
             if(ex != null)
@@ -183,38 +223,41 @@ namespace FadeCandySharp
             // Make a buffer to recieve bytes
             string response = "";
 
-            // Get a response
-            using (AutoResetEvent are = new AutoResetEvent(false))
+            // lock and get a response
+            lock (m_webSocket)
             {
-                ThreadPool.QueueUserWorkItem(async (object obj) =>
+                using (AutoResetEvent are = new AutoResetEvent(false))
                 {
-                    try
+                    ThreadPool.QueueUserWorkItem(async (object obj) =>
                     {
-                        bool keepReading = true;
-                        while (keepReading)
+                        try
                         {
-                            // Set up buffers
-                            byte[] recieveArray = new byte[30000];
-                            ArraySegment<byte> recieveBytes = new ArraySegment<byte>(recieveArray);
+                            bool keepReading = true;
+                            while (keepReading)
+                            {
+                                // Set up buffers
+                                byte[] recieveArray = new byte[30000];
+                                ArraySegment<byte> recieveBytes = new ArraySegment<byte>(recieveArray);
 
-                            // Get the response
-                            CancellationToken token = new CancellationToken();
-                            WebSocketReceiveResult result = await m_webSocket.ReceiveAsync(recieveBytes, token);
+                                // Get the response
+                                CancellationToken token = new CancellationToken();
+                                WebSocketReceiveResult result = await m_webSocket.ReceiveAsync(recieveBytes, token);
 
-                            // Add the response
-                            response += Encoding.ASCII.GetString(recieveBytes.Array, 0, result.Count);
+                                // Add the response
+                                response += Encoding.ASCII.GetString(recieveBytes.Array, 0, result.Count);
 
-                            keepReading = (result.Count == 30000 || !result.EndOfMessage);      
-                        }                        
-                    }
-                    catch(Exception e)
-                    {
-                        ex = e;
-                    }
-             
-                    are.Set();
-                });
-                are.WaitOne();
+                                keepReading = (result.Count == 30000 || !result.EndOfMessage);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            ex = e;
+                        }
+
+                        are.Set();
+                    });
+                    are.WaitOne();
+                }
             }
 
             if(ex != null)

@@ -1,9 +1,20 @@
 ﻿<Window x:Class="FadeCandySharpSample.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="350" Width="525">
+        Title="FadeCandyShap Samples!" Height="550" Width="525">
     <StackPanel>
-        <Button x:Name="Connect" Content="Connect" Click="Connect_Click" />
+        <StackPanel Margin="12" Orientation="Horizontal">
+            <TextBlock Text="FadeCandy" Margin="0" FontSize="30" Foreground="Blue" />
+            <TextBlock Text="Sharp!" FontSize="30" Foreground="Red"/>
+        </StackPanel>
+        
+        <TextBlock x:Name="TitleBlock" Text="This is a C# SDK for the FadeCandy LED system for Adafruit. This sample is part of the just-for-fun open source SDK to interface with the FadeCandy USB device. This SDK requires the fadecandy server to be running, it can be found as a part of the SDK." TextWrapping="Wrap" Margin="12" />
+        <TextBlock x:Name="ServerWarn" Visibility="Collapsed" Padding="12" Text="It doesn't appear that the fadecandy server is running, the samples will not work without it!&#x0a;&#x0a;You can find the server in the /bin/ folder in the FadeCandy project code." Margin="0" TextWrapping="Wrap" Background="Yellow" TextAlignment="Center" />
+        
+        <TextBlock x:Name="FadeCandySdk" Text="FadeCandy Project (including the server exe)" Margin="12" Foreground="Blue" TextDecorations="Underline" MouseLeftButtonUp="FadeCandySdk_MouseLeftButtonUp" />
+        <TextBlock x:Name="FadeCandySharpSDK" Text="FadeCandySharp Project (this app)" Margin="12" Foreground="Blue" TextDecorations="Underline" MouseLeftButtonUp="FadeCandySharpSDK_MouseLeftButtonUp"  />
+
+        <Button x:Name="SimpleSampleButton" Content="Simple Sample" Margin="12" Padding="5" FontSize="12" Click="SimpleSampleButton_Click"/>
         
     </StackPanel>
 </Window>
