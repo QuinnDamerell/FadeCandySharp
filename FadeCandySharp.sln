@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FadeCandyUniveral", "FadeCandyUniveral\FadeCandyUniveral.csproj", "{7AFBB19E-2B6A-4806-87C3-363D923DF449}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FadeCandySharp", "FadeCandySharp\FadeCandySharp.csproj", "{3CE22523-6213-4C99-B3E0-8357D1C3BF63}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FadeCandySharpSample", "FadeCandySharpSample\FadeCandySharpSample.csproj", "{CDAC72C7-CCF4-4798-BB7B-A2274D3E030F}"
@@ -15,10 +13,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{7AFBB19E-2B6A-4806-87C3-363D923DF449}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7AFBB19E-2B6A-4806-87C3-363D923DF449}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7AFBB19E-2B6A-4806-87C3-363D923DF449}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7AFBB19E-2B6A-4806-87C3-363D923DF449}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3CE22523-6213-4C99-B3E0-8357D1C3BF63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3CE22523-6213-4C99-B3E0-8357D1C3BF63}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3CE22523-6213-4C99-B3E0-8357D1C3BF63}.Release|Any CPU.ActiveCfg = Release|Any CPU
