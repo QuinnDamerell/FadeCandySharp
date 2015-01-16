@@ -16,19 +16,17 @@ using System.Windows.Shapes;
 namespace FadeCandySharpSample
 {
     /// <summary>
-    /// Interaction logic for SimpleSample.xaml
+    /// This simple samples hows to create a factory, get a device, set a panel and update the 
+    /// pixels on the panel.
     /// </summary>
     public partial class SimpleSample : Window
     {
         FadeCandyDeviceFactory m_factory;
         FadeCandyGridPanel m_panel;
-        MainWindow m_mainWindow;
 
-        public SimpleSample(MainWindow mainWindow)
+        public SimpleSample()
         {
             InitializeComponent();
-
-            m_mainWindow = mainWindow;
         }
 
         ~SimpleSample()
@@ -81,9 +79,6 @@ namespace FadeCandySharpSample
                 }
 
                 ShowStatus("Status: Added Panels!");
-
-                // Call start drawing to begin!
-                device.StartDrawing();
 
                 // Enable the other buttons.
                 AllBlue.IsEnabled = true;

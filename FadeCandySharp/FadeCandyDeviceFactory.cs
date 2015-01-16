@@ -28,6 +28,7 @@ namespace FadeCandySharp
             public List<FadeCandyDevice.DeviceData> devices; 
         }
 
+        // Main constructor of the factory
         public FadeCandyDeviceFactory(string server, int port)
         {
             if(String.IsNullOrWhiteSpace(server) || port < 1 || port > 999999999)
@@ -76,7 +77,7 @@ namespace FadeCandySharp
         }
 
         // This will send raw data to (one?) device. This should only be called by
-        // the devices.
+        // the devices. This should only be called by a device class.
         public void SendRawData(byte[] data)
         {
             EnsureConnection();
@@ -114,7 +115,7 @@ namespace FadeCandySharp
             }            
         }
 
-        // Sets the options for a device.
+        // Sets the options for a device. This should only be called by the device class.
         public void SetDeviceOptions(FadeCandyDevice.DeviceData deviceData, FadeCandyDevice.LightStatus status, bool dither, bool interpolate)
         {
             string lightStr = "null";

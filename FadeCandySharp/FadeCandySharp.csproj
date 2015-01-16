@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="FadeCandyDevice.cs" />
     <Compile Include="FadeCandyDeviceFactory.cs" />
+    <Compile Include="FadeCandyPanelDrawCallback.cs" />
     <Compile Include="Panels\FadeCandyGridPanel.cs" />
     <Compile Include="FadeCandyPanel.cs" />
     <Compile Include="PanelPixel.cs" />

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace FadeCandySharp
 {
+    // This class resprents on pixel.
     public class PanelPixel
     {
         public byte m_red;

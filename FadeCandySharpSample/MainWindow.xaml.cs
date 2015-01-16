@@ -19,7 +19,8 @@ using System.Windows.Shapes;
 namespace FadeCandySharpSample
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// This is the main sample for FadeCandySharp. 
+    /// Run it to see what the SDK can do, look at the code to see how to do it!
     /// </summary>
     public partial class MainWindow : Window
     {
@@ -29,6 +30,7 @@ namespace FadeCandySharpSample
         {
             InitializeComponent();
 
+            // Loop, look for the server
             m_serverExeCheck = new Timer();
             m_serverExeCheck.AutoReset = true;
             m_serverExeCheck.Elapsed += CheckServerExe;
@@ -69,7 +71,15 @@ namespace FadeCandySharpSample
 
         private void SimpleSampleButton_Click(object sender, RoutedEventArgs e)
         {
-            SimpleSample simpleSample = new SimpleSample(this);
+            SimpleSample simpleSample = new SimpleSample();
+            simpleSample.Show();
+            simpleSample.Unloaded += UnblockButtons;
+            BlockButtons();
+        }
+
+        private void SimpleAnimatedButton_Click(object sender, RoutedEventArgs e)
+        {
+            SimpleAnimatedSample simpleSample = new SimpleAnimatedSample();
             simpleSample.Show();
             simpleSample.Unloaded += UnblockButtons;
             BlockButtons();
@@ -81,6 +91,7 @@ namespace FadeCandySharpSample
                 new Action(delegate()
                 {
                     SimpleSampleButton.IsEnabled = false;
+                    SimpleAnimatedButton.IsEnabled = false;
                 }));
         }
 
@@ -90,7 +101,10 @@ namespace FadeCandySharpSample
                new Action(delegate()
                {
                    SimpleSampleButton.IsEnabled = true;
+                   SimpleAnimatedButton.IsEnabled = true;
                }));
         }
+
+  
     }
 }

@@ -23,7 +23,7 @@ namespace FadeCandySharp
         LightStatus m_lightStatus = LightStatus.Auto;
 
         // Panels
-        List<KeyValuePair<int, FadeCandyPanel>> m_panelList;
+        List<KeyValuePair<int, IFadeCandyPanel>> m_panelList;
          
         // Device information, this reflects the json object
         // sent from the server. 
@@ -49,15 +49,16 @@ namespace FadeCandySharp
         {
             m_deviceDetails = jDevice;
             m_factory = factory;
-            m_panelList = new List<KeyValuePair<int, FadeCandyPanel>>();
+            m_panelList = new List<KeyValuePair<int, IFadeCandyPanel>>();
         }
 
+        #region Device Props
+
+        // Gets the device details.
         public DeviceData GetDeviceData()
         {
             return m_deviceDetails;
         }
-
-        #region Device Props
 
         public void SetLightStatus(LightStatus status)
         {
@@ -87,21 +88,24 @@ namespace FadeCandySharp
         #region Panel Stuff
 
         // Used to set a panel into the device.
-        public void AddPanel(int position, FadeCandyPanel panel)
+        public void AddPanel(int position, IFadeCandyPanel panel)
         {
             if(position < 0)
             {
                 throw new Exception("The position can't be negative!");
             }
 
+            // Set ourselves into the panel
+            panel.SetDevice(this);
+
             // Special case the first
             if(m_panelList.Count == 0)
             {
-                m_panelList.Add(new KeyValuePair<int, FadeCandyPanel>(position,panel));
+                m_panelList.Add(new KeyValuePair<int, IFadeCandyPanel>(position, panel));
                 return;
             }
             
-            // Set the pannel into the list, we need to keep these in order
+            // Set the panel into the list, we need to keep these in order
             for(int i = 0; i < m_panelList.Count; i++)
             {
                 if (m_panelList[i].Key == position)
@@ -115,16 +119,16 @@ namespace FadeCandySharp
                 }
                 else
                 {
-                    m_panelList.Insert(i, new KeyValuePair<int, FadeCandyPanel>(position, panel));
+                    m_panelList.Insert(i, new KeyValuePair<int, IFadeCandyPanel>(position, panel));
                     return;
                 }
             }
 
             // If we didn't add it, this is the last panel
-            m_panelList.Insert(m_panelList.Count, new KeyValuePair<int, FadeCandyPanel>(position, panel));
+            m_panelList.Insert(m_panelList.Count, new KeyValuePair<int, IFadeCandyPanel>(position, panel));            
         }
 
-        public FadeCandyPanel RemovePanel(int position)
+        public IFadeCandyPanel RemovePanel(int position)
         {
             // Find the panel...
             for (int i = 0; i < m_panelList.Count; i++)
@@ -132,7 +136,7 @@ namespace FadeCandySharp
                 if (m_panelList[i].Key == position)
                 {
                     // ... remove it
-                    FadeCandyPanel panel = m_panelList[i].Value;
+                    IFadeCandyPanel panel = m_panelList[i].Value;
                     m_panelList.Remove(m_panelList[i]);
                     return panel;
                 }
@@ -146,15 +150,21 @@ namespace FadeCandySharp
 
         #region Drawing
 
-        // Start the drawing tick.
-        public void StartDrawing()
+        // Start the device drawing, this is one of the two modes
+        // of operation.
+        public void StartDrawing(int frequencyMs)
         {
+            if(frequencyMs < 0)
+            {
+                throw new Exception("The frequency can't be less than 0!");
+            }
+
             if (m_drawTimer == null)
             {
                 m_drawTimer = new Timer();
                 m_drawTimer.AutoReset = true;
                 m_drawTimer.Elapsed += Draw;
-                m_drawTimer.Interval = 33;
+                m_drawTimer.Interval = frequencyMs;
             }
             m_drawTimer.Enabled = true;
         }      
@@ -168,11 +178,27 @@ namespace FadeCandySharp
             }
         }
 
+        // Draws if the draw timer is not running. This is the second options of drawing
+        // where the consumer request draws to happen.
+        public void DrawIfTimerNotRunning()
+        {
+            if(m_drawTimer == null || !m_drawTimer.Enabled)
+            {
+                InvokeDraw();
+            }
+        }
+
+        // This function invokes a draw instantly.
+        public void InvokeDraw()
+        {
+            Draw(null, null);
+        }
+
         // Main draw loop, this will call the draw function on each 
-        // attached pannel.
+        // attached panel.
         void Draw(object sender, ElapsedEventArgs e)
         {
-            // Don't draw if we are alredy.
+            // Don't draw if we are already.
             if(m_isDrawing)
             {
                 Debug.WriteLine("Draw was issued while we are drawing!");
@@ -190,7 +216,7 @@ namespace FadeCandySharp
             List<PanelPixel> pixelList = new List<PanelPixel>();
 
             // This will itterate through in order and get all of the pixels from the panels
-            foreach(KeyValuePair<int, FadeCandyPanel> panel in m_panelList)
+            foreach(KeyValuePair<int, IFadeCandyPanel> panel in m_panelList)
             {
                 try
                 {

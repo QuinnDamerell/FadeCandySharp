@@ -1,7 +1,7 @@
 ﻿<Window x:Class="FadeCandySharpSample.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="FadeCandyShap Samples!" Height="550" Width="525">
+        Title="FadeCandyShap Samples!" Height="430" Width="525">
     <StackPanel>
         <StackPanel Margin="12" Orientation="Horizontal">
             <TextBlock Text="FadeCandy" Margin="0" FontSize="30" Foreground="Blue" />
@@ -15,6 +15,8 @@
         <TextBlock x:Name="FadeCandySharpSDK" Text="FadeCandySharp Project (this app)" Margin="12" Foreground="Blue" TextDecorations="Underline" MouseLeftButtonUp="FadeCandySharpSDK_MouseLeftButtonUp"  />
 
         <Button x:Name="SimpleSampleButton" Content="Simple Sample" Margin="12" Padding="5" FontSize="12" Click="SimpleSampleButton_Click"/>
-        
+
+        <Button x:Name="SimpleAnimatedButton" Content="Simple Animated Sample" Margin="12" Padding="5" FontSize="12" Click="SimpleAnimatedButton_Click"/>
+
     </StackPanel>
 </Window>
