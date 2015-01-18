@@ -53,6 +53,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="PongGame\IDrawable.cs" />
+    <Compile Include="PongGame\PongGame.xaml.cs">
+      <DependentUpon>PongGame.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PongGame\PongPaddle.cs" />
+    <Compile Include="PongGame\PongRectangle.cs" />
     <Compile Include="SimpleAnimatedSample\SimpleAnimatedSample.xaml.cs">
       <DependentUpon>SimpleAnimatedSample.xaml</DependentUpon>
     </Compile>
@@ -71,6 +77,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="PongGame\PongGame.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="SimpleAnimatedSample\SimpleAnimatedSample.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

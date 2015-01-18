@@ -85,6 +85,14 @@ namespace FadeCandySharpSample
             BlockButtons();
         }
 
+        private void PongSample_Click(object sender, RoutedEventArgs e)
+        {
+            PongGame pong = new PongGame();
+            pong.Show();
+            pong.Unloaded += UnblockButtons;
+            BlockButtons();
+        }  
+
         private void BlockButtons()
         {
             SimpleSampleButton.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal,
@@ -104,7 +112,5 @@ namespace FadeCandySharpSample
                    SimpleAnimatedButton.IsEnabled = true;
                }));
         }
-
-  
     }
 }
