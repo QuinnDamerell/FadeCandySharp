@@ -10,13 +10,18 @@ namespace FadeCandySharpSample
 {
     public class PongPaddle : IDrawable
     {
-        int m_yOffset;
+        int m_xOffset;
+        int m_gridWidth;
+        int m_gridHeight;
+
         PongRectangle m_rect;
 
-        public PongPaddle(int yOffset)
+        public PongPaddle(int xOffset, int gridWidth, int gridHeight)
         {
-            m_yOffset = yOffset;
-            m_rect = new PongRectangle(3, 1, 0, m_yOffset);
+            m_xOffset = xOffset;
+            m_gridHeight = gridHeight;
+            m_gridWidth = gridWidth;
+            m_rect = new PongRectangle(3, 1, m_xOffset, 0);
         }
 
         public void Draw(FadeCandyGridPanel panel)
@@ -28,11 +33,21 @@ namespace FadeCandySharpSample
         {
            if(lastKeyPressed == Key.Up)
            {
-               m_rect.SetX(m_rect.GetX() + 1);
+               int oldY = m_rect.GetY() - 1;
+               if(oldY < 0)
+               {
+                   oldY = 0;
+               }
+               m_rect.SetY(oldY);
            }
            else if(lastKeyPressed == Key.Down)
            {
-               m_rect.SetX(m_rect.GetX() - 1);
+               int oldY = m_rect.GetY() +1;
+               if (oldY + m_rect.GetHeight() > m_gridHeight)
+               {
+                   oldY = m_gridHeight - m_rect.GetHeight();
+               }
+               m_rect.SetY(oldY);
            }
         }
     }

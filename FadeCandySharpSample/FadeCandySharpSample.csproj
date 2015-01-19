@@ -54,6 +54,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="PongGame\IDrawable.cs" />
+    <Compile Include="PongGame\PongBall.cs" />
     <Compile Include="PongGame\PongGame.xaml.cs">
       <DependentUpon>PongGame.xaml</DependentUpon>
     </Compile>

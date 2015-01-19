@@ -77,9 +77,9 @@ namespace FadeCandySharp
             }
 
             List<PanelPixel> pixels = new List<PanelPixel>();
-            for (int w = 0; w < m_width; w++)
+            for (int h = 0; h < m_height; h++)
             {
-                for(int h = 0; h < m_height; h++)
+                for(int w = 0; w < m_width; w++)
                 {
                     PanelPixel pixel = new PanelPixel();
                     pixel.m_red = m_pixels[w,h,0];
@@ -110,6 +110,16 @@ namespace FadeCandySharp
                 // Draw if the timer isn't running.
                 m_device.DrawIfTimerNotRunning();
             }
+        }
+
+        public int GetWidth()
+        {
+            return m_width;
+        }
+
+        public int GetHeight()
+        {
+            return m_height;
         }
     }
 }

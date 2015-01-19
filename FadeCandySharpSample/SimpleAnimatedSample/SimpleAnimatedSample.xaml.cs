@@ -126,8 +126,8 @@ namespace FadeCandySharpSample
             }
 
             // This function is called by the panel just before each draw.
-            int x = m_counter % PANEL_SIZE;
-            int y = (int)Math.Floor(m_counter / PANEL_SIZE * 1.0);
+            int y = m_counter % PANEL_SIZE;
+            int x = (int)Math.Floor(m_counter / PANEL_SIZE * 1.0);
 
             // Set the pixel color
             byte r, b, g;

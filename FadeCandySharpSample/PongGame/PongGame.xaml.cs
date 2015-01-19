@@ -32,7 +32,8 @@ namespace FadeCandySharpSample
         public PongGame()
         {
             InitializeComponent();
-            m_leftPaddle = new PongPaddle(0);
+            m_leftPaddle = new PongPaddle(0, PANEL_SIZE, PANEL_SIZE);
+            m_rightPaddle = new PongPaddle(PANEL_SIZE -1, PANEL_SIZE, PANEL_SIZE);
             m_lastKeyPressed = Key.Escape;
         }
 
@@ -110,14 +111,24 @@ namespace FadeCandySharpSample
                 return;
             }
 
-            // Update the game state
+            // Update the user's panel
             m_leftPaddle.UpdateState(m_lastKeyPressed);
+            //m_lastKeyPressed = Key.Escape;
+
+            // Update the AI Panel
+            m_rightPaddle.UpdateState(m_lastKeyPressed);
             m_lastKeyPressed = Key.Escape;
 
-            m_panel.ClearAll();
-            m_leftPaddle.Draw(m_panel);
+            // Update the ball
 
-            
+            // Clear the panel
+            m_panel.ClearAll();
+
+            // Draw the paddles
+            m_leftPaddle.Draw(m_panel);
+            m_rightPaddle.Draw(m_panel);
+
+            // Draw the ball          
 
 
         }
